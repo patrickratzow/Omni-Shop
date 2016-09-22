@@ -1,11 +1,29 @@
-
 local tab = 1;
 local speed = 900;
-local function ui()
+net.Receive("OmniShop_Menu", function(len)
+  local ent = net.ReadEntity();
   local scrW, scrH = ScrW(), ScrH();
-  local theme = Omni.theme;
+  local theme = OmniShop.theme;
   local frame = vgui.Create("DFrame");
-  frame:SetSize(scrW * 0.5, scrH * 0.5);
+
+  if (scrW <= 1366) then
+    w = 900;
+    if (scrW <= 799) then -- 640x480...
+      w = 640;
+    end
+  else
+    w = scrW * 0.5;
+  end
+  if (scrH <= 766) then
+    h = 540;
+    if (scrH <= 539) then -- if we go lower than 480 height idk anymore, get a decent PC
+      h = 480;
+    end
+  else
+    h = scrH * 0.5;
+  end
+
+  frame:SetSize(w, h);
   frame:Center();
   frame:DockPadding(0, 0, 0, 0);
   frame:SetTitle("");
@@ -21,17 +39,17 @@ local function ui()
     draw.RoundedBoxEx(6, 0, 0, w, h, theme["Navbar"].color, true, true, false, false);
   end
 
-  for i = 1, table.Count(Omni.shop.config) do
-    Omni.shop.categories[i] = {};
-    Omni.shop.categories[i].Button = vgui.Create("DButton", navbar);
-    Omni.shop.categories[i].Panel = vgui.Create("DPanel", frame);
-    local btn = Omni.shop.categories[i].Button;
-    local pnl = Omni.shop.categories[i].Panel;
+  for i = 1, table.Count(OmniShop.config) do
+    OmniShop.categories[i] = {};
+    OmniShop.categories[i].Button = vgui.Create("DButton", navbar);
+    OmniShop.categories[i].Panel = vgui.Create("DPanel", frame);
+    local btn = OmniShop.categories[i].Button;
+    local pnl = OmniShop.categories[i].Panel;
 
     btn:Dock(LEFT);
     btn.id = i;
-    btn:SetFont("Omni_Tab")
-    btn:SetText(Omni.shop.config[i].catName);
+    btn:SetFont("Omni_Tab");
+    btn:SetText(OmniShop.config[i].catName);
     btn.PerformLayout = function(self, w, h)
       DButton.PerformLayout(self, w, h)
       surface.SetFont("Omni_Tab");
@@ -65,7 +83,7 @@ local function ui()
     end
     btn.DoClick = function(self, w, h)
       tab = self.id;
-      for i,v in pairs (Omni.shop.categories) do
+      for i,v in pairs (OmniShop.categories) do
         if (tab == i) then
           v.Panel:SetVisible(true);
         else
@@ -96,7 +114,7 @@ local function ui()
     local layout = vgui.Create("DListLayout", scroll);
     local texture = Material("gui/gradient_down.vtf");
     local changeColor = false;
-    for _,v in pairs(Omni.shop.config[i]) do
+    for _,v in pairs(OmniShop.config[i]) do
       if (_ != "catName") then
         local panel = vgui.Create("DPanel");
         panel:Dock(FILL);
@@ -110,23 +128,38 @@ local function ui()
           draw.RoundedBox(0, 0, 0, w, h, self.color);
         end
 
-        local mdl = vgui.Create("DModelPanel", panel);
-        mdl:Dock(LEFT);
-        mdl:DockMargin(5, 10, 10, 5);
-        mdl:SetModel(v.model);
-        mdl.LayoutEntity = function() end
-        local mn, mx = mdl.Entity:GetRenderBounds()
-        local size = 0
-        size = math.max( size, math.abs(mn.x) + math.abs(mx.x) )
-        size = math.max( size, math.abs(mn.y) + math.abs(mx.y) )
-        size = math.max( size, math.abs(mn.z) + math.abs(mx.z) )
+        local mdl;
+        if (v.model) then
+          mdl = vgui.Create("DModelPanel", panel);
+          mdl:Dock(LEFT);
+          mdl:DockMargin(10, 10, 10, 10);
+          mdl:SetModel(v.img);
+          mdl.type = "mdl";
+          mdl.LayoutEntity = function() end
+          local mn, mx = mdl.Entity:GetRenderBounds();
+          local size = 0;
+          size = math.max(size, math.abs(mn.x) + math.abs(mx.x));
+          size = math.max(size, math.abs(mn.y) + math.abs(mx.y));
+          size = math.max(size, math.abs(mn.z) + math.abs(mx.z));
 
-        mdl:SetFOV( 45 )
-        mdl:SetCamPos( Vector( size, size, size ) )
-        mdl:SetLookAt( (mn + mx) * 0.5 )
+          mdl:SetFOV(45);
+          mdl:SetCamPos(Vector(size, size, size));
+          mdl:SetLookAt((mn + mx) * 0.5);
+        else
+          mdl = vgui.Create("DPanel", panel);
+          mdl:Dock(LEFT);
+          mdl.type = "img";
+          mdl:DockMargin(20, 15, 20, 15);
+          mdl.img = Material(v.img);
+          mdl.Paint = function(self, w, h)
+            surface.SetMaterial(self.img);
+            surface.SetDrawColor(color_white);
+            surface.DrawTexturedRect(0, 0, w, h);
+          end
+        end
 
         local name = vgui.Create("DLabel", panel);
-        name:SetPos(95, 13.5);
+        name:SetPos(95, 15);
         name:SetFont("Omni_ShopName");
         name:SetTextColor(theme["Colors"].whiteGrey);
         name:SetText(v.name or "no name");
@@ -134,7 +167,7 @@ local function ui()
         name:SizeToContents();
 
         local desc = vgui.Create("DLabel", panel);
-        desc:SetPos(95, name:GetTall() + 8.5);
+        desc:SetPos(95, name:GetTall() + 10);
         desc:SetFont("Omni_ShopDesc");
         desc:SetTextColor(theme["Colors"].whiteGrey);
         desc:SetText(v.desc or "LOREM IPSUM BBY");
@@ -149,6 +182,9 @@ local function ui()
         local buyColor;
         if (LocalPlayer():canAfford(v.price or math.random(20, 80))) then
           buyColor = theme["Colors"].green;
+          if (v.vip && !table.HasValue(OmniShop.vipGroups, LocalPlayer():GetUserGroup())) then
+            buyColor = theme["Colors"].red;
+          end
         else
           buyColor = theme["Colors"].red;
         end
@@ -167,22 +203,49 @@ local function ui()
           net.Start("OmniShop_Purchase");
             net.WriteUInt(i, 5);
             net.WriteUInt(_, 16);
+            net.WriteEntity(ent);
           net.SendToServer();
         end
 
         local price = vgui.Create("DLabel", panel);
         price:Dock(RIGHT);
         price:SetContentAlignment(6);
-        price:DockMargin(0, 0, 10, 0);
+        price:DockMargin(0, 0, 15, 0);
         price:SetFont("Omni_ShopDollar");
         price:SetText(DarkRP.formatMoney(v.price));
-        price:SetTextColor(theme["Colors"].white);
+        price:SetTextColor(theme["Colors"].whiteGrey);
         price:SizeToContents();
+
+        if (!LocalPlayer():canAfford(v.price)) then
+          local cantAfford = vgui.Create("DLabel", panel);
+          cantAfford:Dock(RIGHT);
+          cantAfford:SetText("Can't afford!");
+          cantAfford:DockMargin(0, 0, 10, 0);
+          cantAfford:SetTextColor(theme["Colors"].red);
+          cantAfford:SetFont("Omni_ShopDollar");
+          cantAfford:SetContentAlignment(6);
+          cantAfford:SizeToContents();
+        end
+
+        if (v.vip && !table.HasValue(OmniShop.vipGroups, LocalPlayer():GetUserGroup())) then
+          local vip = vgui.Create("DLabel", panel);
+          vip:Dock(RIGHT);
+          vip:SetText("Donator only!");
+          vip:DockMargin(0, 0, 10, 0);
+          vip:SetFont("Omni_ShopDollar");
+          vip:SetTextColor(theme["Colors"].red);
+          vip:SetContentAlignment(6);
+          vip:SizeToContents();
+        end
 
         panel.PerformLayout = function(self, w, h)
           DPanel.PerformLayout(self, w, h);
           self:SetTall(80);
-          mdl:SetSize(80, 80);
+          if (mdl.type == "mdl") then
+            mdl:SetSize(80, 80);
+          else
+            mdl:SetSize(60, 60);
+          end
           buy:SetWide(100);
         end
         layout:Add(panel);
@@ -200,7 +263,7 @@ local function ui()
       gradient:SetSize(w, 5);
     end
 
-    for i,v in pairs (Omni.shop.categories) do
+    for i,v in pairs (OmniShop.categories) do
       if (IsValid(v.Panel)) then
         if (i == tab) then
           v.Panel:SetVisible(true);
@@ -235,7 +298,4 @@ local function ui()
     navbar:SetTall(50);
     closeBtn:SetWide(50);
   end
-
-end
-
-concommand.Add("shop", ui)
+end)

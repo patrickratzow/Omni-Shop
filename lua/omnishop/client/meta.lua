@@ -1,12 +1,13 @@
 local function findColorDifference(b,c)local d,e,f=b.r,b.g,b.b;local g,h,i=c.r,c.g,c.b;local j;local k;local l;if d>=g then j=g;l=d;k=g else j=d;l=g;k=d end;local m;local n;local o;if e>=h then m=h;o=e;n=h else m=e;o=h;n=e end;local p;local q;local r;if f>=i then p=i;r=f;q=i else p=f;r=i;q=i end;return j,k,l,m,n,o,p,q,r end
-
+-- minified and lost the orginial version lol. I'll explain it even through its not hard to read.
+-- basically finds a min and max for math.Approach for 2 colors :P
 local pnlMeta = FindMetaTable("Panel");
 local speed = 900;
 
 function pnlMeta:AddHoverEffect(prevCol, nextCol, func)
   local r2,g2,b2 = nextCol.r, nextCol.g, nextCol.b;
   local alpha = 0;
-  local r,rLe,rMax,g,gLe,gMax,b,bLe,bMax,decreaseSpeed,increaseSpeed,buttonChangeSpeed = findColorDifference(Color(r2, g2, b2), Color(prevCol.r, prevCol.g, prevCol.b));
+  local r,rLe,rMax,g,gLe,gMax,b,bLe,bMax = findColorDifference(Color(r2, g2, b2), Color(prevCol.r, prevCol.g, prevCol.b));
   local haveTouchedHover = false;
 
   self.Paint = function(self, w, h)
@@ -17,10 +18,10 @@ function pnlMeta:AddHoverEffect(prevCol, nextCol, func)
       r = math.Approach(rLe, rMax, r - (RealFrameTime()*speed) );
       g = math.Approach(gLe, gMax, g - (RealFrameTime()*speed) );
       b = math.Approach(bLe, bMax, b - (RealFrameTime()*speed) );
-      if ( alpha <= 8 ) then
+      if (alpha <= 8) then
         alpha = 0;
       end
-    elseif ( hover && alpha <= 255 ) then
+    elseif (hover && alpha <= 255) then
       alpha = math.Approach(0, 255, alpha + (RealFrameTime()*speed) );
       r = math.Approach(rLe, prevCol.r, r + (RealFrameTime()*speed) );
       g = math.Approach(gLe, prevCol.g,  g + (RealFrameTime()*speed) );
@@ -40,7 +41,7 @@ end
 function pnlMeta:AddGhostEffect(prevCol, nextCol, func)
   local r2,g2,b2 = nextCol.r, nextCol.g, nextCol.b;
   local alpha = 0;
-  local r,rLe,rMax,g,gLe,gMax,b,bLe,bMax,decreaseSpeed,increaseSpeed,buttonChangeSpeed = findColorDifference(Color(r2, g2, b2), Color(prevCol.r, prevCol.g, prevCol.b));
+  local r,rLe,rMax,g,gLe,gMax,b,bLe,bMax = findColorDifference(Color(r2, g2, b2), Color(prevCol.r, prevCol.g, prevCol.b));
   local haveTouchedHover = false;
 
   self.Paint = function(self, w, h)
@@ -51,10 +52,10 @@ function pnlMeta:AddGhostEffect(prevCol, nextCol, func)
       r = math.Approach(rLe, rMax, r - (RealFrameTime()*speed) );
       g = math.Approach(gLe, gMax, g - (RealFrameTime()*speed) );
       b = math.Approach(bLe, bMax, b - (RealFrameTime()*speed) );
-      if ( alpha <= 8 ) then
+      if (alpha <= 8) then
         alpha = 0;
       end
-    elseif ( hover && alpha <= 255 ) then
+    elseif (hover && alpha <= 255) then
       alpha = math.Approach(0, 255, alpha + (RealFrameTime()*speed) );
       r = math.Approach(rLe, prevCol.r, r + (RealFrameTime()*speed) );
       g = math.Approach(gLe, prevCol.g,  g + (RealFrameTime()*speed) );
@@ -77,7 +78,7 @@ end
 function pnlMeta:AddFadeEffect(prevCol, nextCol, func)
   local r2,g2,b2 = nextCol.r, nextCol.g, nextCol.b;
   local alpha = 0;
-  local r,rLe,rMax,g,gLe,gMax,b,bLe,bMax,decreaseSpeed,increaseSpeed,buttonChangeSpeed = findColorDifference(Color(r2, g2, b2), Color(prevCol.r, prevCol.g, prevCol.b));
+  local r,rLe,rMax,g,gLe,gMax,b,bLe,bMax = findColorDifference(Color(r2, g2, b2), Color(prevCol.r, prevCol.g, prevCol.b));
   local haveTouchedHover = false;
 
   self.Paint = function(self, w, h)
@@ -88,10 +89,10 @@ function pnlMeta:AddFadeEffect(prevCol, nextCol, func)
       r = math.Approach(rLe, rMax, r - (RealFrameTime()*speed) );
       g = math.Approach(gLe, gMax, g - (RealFrameTime()*speed) );
       b = math.Approach(bLe, bMax, b - (RealFrameTime()*speed) );
-      if ( alpha <= 8 ) then
+      if (alpha <= 8) then
         alpha = 0;
       end
-    elseif ( hover && alpha <= 255 ) then
+    elseif (hover && alpha <= 255) then
       alpha = math.Approach(0, 255, alpha + (RealFrameTime()*speed) );
       r = math.Approach(rLe, prevCol.r, r + (RealFrameTime()*speed) );
       g = math.Approach(gLe, prevCol.g,  g + (RealFrameTime()*speed) );
