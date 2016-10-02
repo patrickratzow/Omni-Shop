@@ -1,6 +1,7 @@
 local function findColorDifference(b,c)local d,e,f=b.r,b.g,b.b;local g,h,i=c.r,c.g,c.b;local j;local k;local l;if d>=g then j=g;l=d;k=g else j=d;l=g;k=d end;local m;local n;local o;if e>=h then m=h;o=e;n=h else m=e;o=h;n=e end;local p;local q;local r;if f>=i then p=i;r=f;q=i else p=f;r=i;q=i end;return j,k,l,m,n,o,p,q,r end
 -- minified and lost the orginial version lol. I'll explain it even through its not hard to read.
 -- basically finds a min and max for math.Approach for 2 colors :P
+
 local pnlMeta = FindMetaTable("Panel");
 local speed = 900;
 
@@ -32,7 +33,7 @@ function pnlMeta:AddHoverEffect(prevCol, nextCol, func)
     draw.RoundedBoxEx(6, 0, 0, w, h, Color(r2, g2, b2,alpha), false, true, false, false);
 
     if (func) then
-      func(self, w, h, Color(r, g, b), Color(r2, g2, b2), haveTouchedHover)
+      func(self, w, h, Color(r, g, b, alpha), Color(r2, g2, b2, alpha), haveTouchedHover)
     end
   end
 
@@ -101,7 +102,7 @@ function pnlMeta:AddFadeEffect(prevCol, nextCol, func)
     end
 
     if (func) then
-      func(self, w, h, Color(r, g, b), Color(r2, g2, b2), haveTouchedHover)
+      func(self, w, h, Color(r, g, b, alpha), Color(r2, g2, b2, alpha), haveTouchedHover)
     end
   end
 end
