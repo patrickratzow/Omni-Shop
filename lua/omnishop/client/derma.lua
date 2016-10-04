@@ -6,6 +6,7 @@ net.Receive("OmniShop_Menu", function(len)
   local theme = OmniShop.theme;
   local tab = ent.tab or 1;
   local frame = vgui.Create("DFrame");
+  local plyLevel = 2; -- OmniShop.levelSystemTable[OmniShop.levelSystem]["level"][get(ply)];
 
   ent.categories = {};
   if (scrW <= 1366) then
@@ -45,6 +46,7 @@ net.Receive("OmniShop_Menu", function(len)
     ent.categories[i] = {};
     ent.categories[i].Button = vgui.Create("DButton", navbar);
     ent.categories[i].Panel = vgui.Create("DPanel", frame);
+
     local btn = ent.categories[i].Button;
     local pnl = ent.categories[i].Panel;
 
@@ -122,6 +124,7 @@ net.Receive("OmniShop_Menu", function(len)
         local itemPrice = OmniShop.findPrice(ply, v.price, ent.vipGroups);
         local plyIsVIP = OmniShop.isVIP(ent, ply);
         local isVip = v.vip;
+        local level = v.level or -1;
 
         local panel = vgui.Create("DPanel");
         panel:Dock(FILL);
@@ -189,7 +192,7 @@ net.Receive("OmniShop_Menu", function(len)
         local buyColor;
         if (ply:canAfford(itemPrice)) then
           buyColor = theme["Colors"].green;
-          if (isVip && !plyIsVIP) then
+          if (isVip && !plyIsVIP && (level >= 1 && plyLevel >= level)) then
             buyColor = theme["Colors"].red;
           end
         else
@@ -243,6 +246,17 @@ net.Receive("OmniShop_Menu", function(len)
           vip:SetTextColor(theme["Colors"].red);
           vip:SetContentAlignment(6);
           vip:SizeToContents();
+        end
+
+        if (level >= 1 && plyLevel < level) then
+          local levelText = vgui.Create("DLabel", panel);
+          levelText:Dock(RIGHT);
+          levelText:SetText("Level "..level.."+");
+          levelText:DockMargin(0, 0, 10, 0);
+          levelText:SetFont("Omni_ShopDollar");
+          levelText:SetTextColor(theme["Colors"].red);
+          levelText:SetContentAlignment(6);
+          levelText:SizeToContents();
         end
 
         panel.PerformLayout = function(self, w, h)

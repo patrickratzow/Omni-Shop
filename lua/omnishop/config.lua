@@ -1,3 +1,5 @@
+OmniShop.levelSystem = "vrondakis";
+
 -- Theme
 OmniShop.theme = {
   ["Navbar"] = {

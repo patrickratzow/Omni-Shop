@@ -13,11 +13,15 @@ function ENT:Initialize()
 	self:DropToFloor();
 	self:SetMaxYawSpeed(90);
 	self:DropToFloor();
-  OmniShop.saveConfig();
+	timer.Simple(1, function()
+  	OmniShop.saveConfig();
+	end)
 end
 
 function ENT:OnRemove()
-	OmniShop.saveConfig();
+	timer.Simple(1, function()
+  	OmniShop.saveConfig();
+	end)
 end
 
 function ENT:AcceptInput(name, activator, caller, data)

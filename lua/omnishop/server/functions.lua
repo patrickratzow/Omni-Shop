@@ -17,7 +17,7 @@ function OmniShop.saveConfig()
 end
 
 hook.Add("InitPostEntity", "OmniShop_InitPostEntity", function()
-  if (!file.Exists("omni/shop/npc2.txt")) then return; end
+  if (!file.Exists("omni/shop/npc2.txt", "DATA")) then return; end
 
   local tbl = util.JSONToTable(file.Read("omni/shop/npc2.txt", "DATA"));
   for _,v in pairs(tbl) do

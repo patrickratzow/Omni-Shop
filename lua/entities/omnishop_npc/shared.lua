@@ -41,6 +41,10 @@ OmniShop.funcs.buyVrondakisLevel
 To create more functions go to:
 garrysmod/addons/omni_shop/lua/omnishop/item_functions.lua
 ]]
+local cops = {
+  TEAM_CITIZEN;
+}
+
 ENT.config = {
   [1] = {
     catName = "Misc";
@@ -52,6 +56,7 @@ ENT.config = {
 			desc = "Kill dose fgts";
 			func = OmniShop.funcs.buyGun;
 			reward = "weapon_pistol";
+      level = 4;
 		},
 		{
 			model = true;
@@ -87,5 +92,3 @@ ENT.vipGroups = {
 	["superdonator"] = { vip = true, modifier = 0.75 };
   ["superadmin"] = { vip = true, modifier = 0.50 };
 };
-
-PrintTable(ENT.vipGroups);

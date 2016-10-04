@@ -1,16 +1,21 @@
 function OmniShop.getUserGroup(ply)
-  -- todo: add support for shit that doesn't use admin shit that overwrites PLAYER:GetUserGroup()
-  -- aka shit admin mods
-  local usergroup = nil;
-  usergroup = ply:GetUserGroup();
+  local usergroup = "user";
+
+  if (istable(evolve)) then -- Evolve
+    usergroup = ply:EV_GetRank();
+  elseif (istable(serverguard)) then -- Serverguard
+    usergroup = serverguard.player:GetRank();
+  else -- assume everything else (ULX uses this too)
+    usergroup = ply:GetUserGroup();
+  end
 
   return usergroup;
 end
 
 function OmniShop.isVIP(npc, ply)
-  local userGroups = npc.vipGroups;
-  local userGroup = userGroups[OmniShop.getUserGroup(ply)];
-  
+  local vipGroups = npc.vipGroups;
+  local userGroup = vipGroups[OmniShop.getUserGroup(ply)];
+
   if (userGroup == nil) then
     return false;
   end
