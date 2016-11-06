@@ -6,13 +6,16 @@ net.Receive("OmniShop_Menu", function(len)
   local theme = OmniShop.theme;
   local tab = ent.tab or 1;
   local frame = vgui.Create("DFrame");
-  local plyLevel = 2; -- OmniShop.levelSystemTable[OmniShop.levelSystem]["level"][get(ply)];
-
+  local plyLevel = OmniShop.levelSystemTable[OmniShop.levelSystem]["level"].get(ply);
+  if (plyLevel == nil) then plyLevel = 1; end
+  local rounding = 6;
+  
   ent.categories = {};
   if (scrW <= 1366) then
     w = 900;
     if (scrW <= 799) then -- 640x480...
       w = 640;
+      rounding = 0;
     end
   else
     w = scrW * 0.5;
@@ -33,13 +36,13 @@ net.Receive("OmniShop_Menu", function(len)
   frame:ShowCloseButton(false);
   frame:MakePopup();
   frame.Paint = function(self, w, h)
-    draw.RoundedBox(6, 0, 0, w, h, theme["Frame"].color);
+    draw.RoundedBox(rounding, 0, 0, w, h, theme["Frame"].color);
   end
 
   local navbar = vgui.Create("DPanel", frame);
   navbar:Dock(TOP);
   navbar.Paint = function(self, w, h)
-    draw.RoundedBoxEx(6, 0, 0, w, h, theme["Navbar"].color, true, true, false, false);
+    draw.RoundedBoxEx(rounding, 0, 0, w, h, theme["Navbar"].color, true, true, false, false);
   end
 
   for i = 1, table.Count(ent.config) do
@@ -80,7 +83,7 @@ net.Receive("OmniShop_Menu", function(len)
         self.h = math.Approach(self.h, btn.start, RealFrameTime() * (speed/2));
       end
       if (self.h >= h - 4 && self.id == 1) then
-        draw.RoundedBoxEx(6, 0, h - self.h, w, self.h, theme["Colors"].blue, true, false, false, false);
+        draw.RoundedBoxEx(rounding, 0, h - self.h, w, self.h, theme["Colors"].blue, true, false, false, false);
       else
         draw.RoundedBox(0, 0, h - self.h, w, self.h, theme["Colors"].blue);
       end
@@ -125,6 +128,12 @@ net.Receive("OmniShop_Menu", function(len)
         local plyIsVIP = OmniShop.isVIP(ent, ply);
         local isVip = v.vip;
         local level = v.level or -1;
+        local plyWrongTeam = false;
+        if (v.allowedTeams != nil) then
+          if (!table.HasValue(v.allowedTeams, ply:Team())) then
+            plyWrongTeam = true;
+          end
+        end
 
         local panel = vgui.Create("DPanel");
         panel:Dock(FILL);
@@ -192,7 +201,11 @@ net.Receive("OmniShop_Menu", function(len)
         local buyColor;
         if (ply:canAfford(itemPrice)) then
           buyColor = theme["Colors"].green;
-          if (isVip && !plyIsVIP && (level >= 1 && plyLevel >= level)) then
+          if (isVip && !plyIsVIP) then
+            buyColor = theme["Colors"].red;
+          elseif (level >= 1 && plyLevel < level) then
+            buyColor = theme["Colors"].red;
+          elseif (plyWrongTeam) then
             buyColor = theme["Colors"].red;
           end
         else
@@ -226,6 +239,17 @@ net.Receive("OmniShop_Menu", function(len)
         price:SetTextColor(theme["Colors"].whiteGrey);
         price:SizeToContents();
 
+        if (plyWrongTeam) then
+          local wrongTeam = vgui.Create("DLabel", panel);
+          wrongTeam:Dock(RIGHT);
+          wrongTeam:SetText(v.wrongTeamMsg or "Wrong team!");
+          wrongTeam:DockMargin(0, 0, 10, 0);
+          wrongTeam:SetTextColor(theme["Colors"].red);
+          wrongTeam:SetFont("Omni_ShopDollar");
+          wrongTeam:SetContentAlignment(6);
+          wrongTeam:SizeToContents();
+        end
+
         if (!ply:canAfford(itemPrice)) then
           local cantAfford = vgui.Create("DLabel", panel);
           cantAfford:Dock(RIGHT);
@@ -248,10 +272,10 @@ net.Receive("OmniShop_Menu", function(len)
           vip:SizeToContents();
         end
 
-        if (level >= 1 && plyLevel < level) then
+        if (level >= 1 && (plyLevel < level)) then
           local levelText = vgui.Create("DLabel", panel);
           levelText:Dock(RIGHT);
-          levelText:SetText("Level "..level.."+");
+          levelText:SetText("Level "..level);
           levelText:DockMargin(0, 0, 10, 0);
           levelText:SetFont("Omni_ShopDollar");
           levelText:SetTextColor(theme["Colors"].red);

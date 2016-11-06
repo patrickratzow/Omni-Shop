@@ -11,7 +11,7 @@ ENT.Author = "Pat";
 ENT.model = "models/Humans/Group03/Male_04.mdl";
 
 --[[
-[categoryId (ONLY NUMBERS)] = {
+[categoryId (ONLY NUMBERS)] = { -- lowest number = the first (from left -> right)
 	catName = "Category" -- category name
 	{ -- start of new item
 		model = true, -- if true then we use a model, otherwise we use a image (material)
@@ -20,8 +20,16 @@ ENT.model = "models/Humans/Group03/Male_04.mdl";
 		name = "name", -- name of item
 		desc = "desc", -- description for the item
 		func = function, -- refer to a OmniShop.funcs function.
-		reward = "reward", -- what reward? Either a "string" or a number.
+		reward = "reward", -- what reward? Either a "string" or a number. For food/props this is the model.
 		vip = true, -- true/false. VIP (donator) item or not
+    level = 10, -- what level should be required to buy this item?
+    allowedTeams = {
+      TEAM_CITIZEN,
+      TEAM_CIVILPROTECTION
+    }, -- what teams is allowed to buy this?
+    wrongTeamMsg = "Only Citizens/CPs!", -- message in menu/notification if they cant buy it because of their team.
+    energy = 20 -- how much energy does it food give?
+  }
 	}, -- end of item
 },
 
@@ -35,28 +43,27 @@ OmniShop.funcs.buyPS1Item
 OmniShop.funcs.buyPS2StandardPoints
 OmniShop.funcs.buyPS2PremiumPoints
 OmniShop.funcs.buyPS2Item
-OmniShop.funcs.buyVrondakisExperience
-OmniShop.funcs.buyVrondakisLevel
+OmniShop.funcs.buyExperience
+OmniShop.funcs.buyLevel
+OmniShop.funcs.buyFood
+OmniShop.funcs.buyProp
+OmniShop.funcs.buyEntity
 
 To create more functions go to:
 garrysmod/addons/omni_shop/lua/omnishop/item_functions.lua
 ]]
-local cops = {
-  TEAM_CITIZEN;
-}
 
 ENT.config = {
   [1] = {
     catName = "Misc";
 		{
 			model = true;
-			img = "models/weapons/w_Pistol.mdl";
+			img = "models/props_c17/consolebox01a.mdl";
 			price = 10;
-			name = "Pistol";
-			desc = "Kill dose fgts";
-			func = OmniShop.funcs.buyGun;
-			reward = "weapon_pistol";
-      level = 4;
+			name = "Money Printer";
+			desc = "print some kush";
+			func = OmniShop.funcs.buyEntity;
+			reward = "money_printer";
 		},
 		{
 			model = true;
@@ -74,11 +81,11 @@ ENT.config = {
 		{
 			model = true;
 			img = "models/weapons/w_Pistol.mdl";
-			price = 500;
-			name = "Pistol";
+			price = 2;
+			name = "Food";
 			desc = "Kill dose fgts";
-			func = OmniShop.funcs.buyGun;
-			reward = "weapon_pistol";
+			func = OmniShop.funcs.buyProp;
+			reward = "models/props_junk/watermelon01.mdl";
 			vip = true;
 		},
   };

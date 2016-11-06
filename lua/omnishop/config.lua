@@ -1,4 +1,5 @@
 OmniShop.levelSystem = "vrondakis";
+OmniShop.coffeeInventory = false;
 
 -- Theme
 OmniShop.theme = {
@@ -17,6 +18,7 @@ OmniShop.theme = {
     red = Color(224, 65, 72);
     green = Color(62, 210, 71);
     white = Color(235, 239, 241);
+    whiteGrey = Color(200, 200, 200);
     black = Color(29, 31, 33);
   }
 };
